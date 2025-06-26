@@ -1,0 +1,16 @@
+{
+    "specs": [
+      
+      {
+        "title": "Verana Indexer Specification",
+        "spec_directory": "./",
+        "logo": "https://verana.foundation/img/logo.svg",
+        "logo_link": "https://verana.foundation",
+        "source": {
+          "host": "github",
+          "account": "verana-labs",
+          "repo": "verana-indexer-spec"
+        }
+      }
+    ]
+  }
