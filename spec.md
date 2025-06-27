@@ -28,6 +28,39 @@ This specification is for the Verana Indexer, a container-based App easily deplo
 
 *This section is non-normative.*
 
+### Why We Need the Verana Indexer
+
+1. **Ledger Storage Is Expensive**  
+   * Every on-chain byte costs gas or block space.  
+   * To keep fees low, a VPR stores only the **minimum viable record** (IDs, hashes, pointers, values).
+
+2. **Limited Native Indexing**  
+   * Blockchains are append-only logs, not SQL engines.  
+   * Adding many on-chain indexes would explode storage costs and slow consensus.
+
+3. **Query Complexity**  
+   * Wallets and services still need fast look-ups:  
+     - *Is this credential issued by an authorized issuer?*  
+     - *Which credential schema contains the word "name"?*  
+   * Without an indexer, you’d have to **scan the entire chain** for each query, which is costly and impractical.
+
+4. **Trust Resolution**
+   * Trust-resolving a DID with the [Verre] library takes some time.
+   * Data stored in credentials is not present in the ledger.
+   * Without the indexer, it would not be possible to search credential attributes.
+
+### 🔧 Enter the Verana Indexer
+
+| Feature | Purpose |
+|---------|---------|
+| **Ledger Listener** | Subscribes to new blocks & events. |
+| **Selective Ingest** | Index only new information or modified information. |
+| **Off-Chain Database** | Builds optimized tables & secondary indexes. |
+| **Real-Time Updates** | Each ledger transaction triggers an index refresh, keeping data in sync. |
+| **Lightweight Container** | Runs anywhere: validator nodes, cloud, or self-hosted. |
+
+With the Verana Indexer, the ledger stays lean, yet wallets, verifiers, and dashboards get millisecond-fast queries. It marries on-chain integrity with off-chain speed, and makes every credential uncovered during trust resolution instantly searchable.
+
 ## Terminology
 
 TBW
@@ -48,28 +81,10 @@ The Verana Indexer MUST be delivered as a container.
 
 #### [GENERAL-ENV] General - Container Variables
 
-| Type                           |Variable                               | Description                    | Default Value (if unspecified)                    |
-|--------------------------------|---------------------------------------|----------------------------------|----------------------------------|
-| General                        | APP_NAME                              |                                  | Veranito                         |
-|                                | APP_LOGO                              |                                  | logo.svg                        |
-|                                | ADDRESS_EXPLORER                      |                                  | https://www.mintscan.io/verana/address/VERANA_ADDRESS   |
-| Network Configuration          | MAINNET_API_ENDPOINT                  |                                  | https://api.verana.network       |
-|                                | MAINNET_RPC_ENDPOINT                  |                                  | https://rpc.verana.network       |
-|                                | MAINNET_IDX_ENDPOINT                  |                                  | https://idx.verana.network       |
-|                                | MAINNET_CHAIN_ID                      |                                  | vna-mainnet-1       |
-|                                | MAINNET_NAME                          |                                  | Mainnet       |
-|                                | MAINNET_TOPUP_VS                      |   List of VSs for top-up       | did:example:123, did:example:456       |
-|                                | TESTNET_API_ENDPOINT                  |                                  | https://api.testnet.verana.network       |
-|                                | TESTNET_RPC_ENDPOINT                  |                                  | https://rpc.testnet.verana.network       |
-|                                | TESTNET_IDX_ENDPOINT                  |                                  | https://idx.testnet.verana.network       |
-|                                | TESTNET_CHAIN_ID                      |                                  | vna-testnet-1       |
-|                                | TESTNET_NAME                          |                                  | Testnet       |
-|                                | TESTNET_TOPUP_VS                      |   List of VSs for top-up       | did:example:123, did:example:456       |
-|                                | DEVNETS__VNA-DEVNET_MAIN__API_ENDPOINT|                                  | https://api.vna-devnet-main.devnet.verana.network       |
-|                                | DEVNETS__VNA-DEVNET_MAIN__RPC_ENDPOINT|                                  | https://rpc.vna-devnet-main.devnet.verana.network       |
-|                                | DEVNETS__VNA-DEVNET_MAIN__IDX_ENDPOINT|                                  | https://idx.vna-devnet-main.devnet.verana.network       |
-|                                | DEVNETS__VNA-DEVNET_MAIN__NAME        |                                  | Vna Devnet Main       |
-|                                | DEVNETS__VNA-DEVNET_MAIN__TOPUP_VS    |   List of VSs for top-up       | did:example:123, did:example:456       |
-|                                | DEFAULT_NETWORK                       |   Default selected network in App    | vna-mainnet-1       |
-| Internationalization           | DEFAULT_LOCALE                        |   Failover locale | en_US       |
-|                                | SUPPORTED_LOCALES                     |                                  | en_US, fr_FR, en:en_US, fr:fr_FR       |
+| Type                   |Variable       | Description | Default Value (if unspecified) |
+|------------------------|---------------|-----|----------------------------------|
+| Network Configuration  | API_ENDPOINT  |     | https://api.verana.network       |
+|                        | RPC_ENDPOINT  |     | https://rpc.verana.network       |
+|                        | CHAIN_ID      |     | vna-mainnet-1       |
+|                        | NETWORK_NAME  |     | Mainnet       |
+
