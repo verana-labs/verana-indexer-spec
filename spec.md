@@ -124,6 +124,10 @@ DID Directory MUST be indexed.
 
 Trust Deposits MUST be indexed.
 
+## [QUERY]
+
+All query answers MUST be paginated.
+
 ## Implementation
 
 As several cosmos-sdk based chain indexer implementations exist, it will be faster to fork and extend one instead of rebuilding everything from scratch. You should do your own research and we should discuss the choice before starting to build.
