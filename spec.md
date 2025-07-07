@@ -124,6 +124,10 @@ DID Directory MUST be indexed.
 
 Trust Deposits MUST be indexed.
 
+## [IDX-GLOBAL]
+
+Global Variables MUST be indexed.
+
 ## [QUERY]
 
 All query answers MUST be paginated.
