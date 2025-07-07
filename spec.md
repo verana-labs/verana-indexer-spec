@@ -56,7 +56,7 @@ This specification is for the Verana Indexer, a container-based App easily deplo
 | **Ledger Listener** | Subscribes to new blocks & events. |
 | **Selective Ingest** | Index only new information or modified information. |
 | **Off-Chain Database** | Builds optimized tables & secondary indexes. |
-| **Real-Time Updates** | Each ledger transaction triggers an index refresh, keeping data in sync. |
+| **Real-Time Updates** | Each ledger new block triggers an index refresh, keeping data in sync. |
 | **Lightweight Container** | Runs anywhere: validator nodes, cloud, or self-hosted. |
 
 With the Verana Indexer, the ledger stays lean, yet wallets, verifiers, and dashboards get millisecond-fast queries. It marries on-chain integrity with off-chain speed, and makes every credential uncovered during trust resolution instantly searchable.
@@ -88,3 +88,44 @@ The Verana Indexer MUST be delivered as a container.
 |                        | CHAIN_ID      |     | vna-mainnet-1       |
 |                        | NETWORK_NAME  |     | Mainnet       |
 
+
+## [IDX-GENERAL]
+
+[IDX-GENERAL-DID-TR] Any found DID MUST be resolved and all its DID document attributes indexed.
+[IDX-GENERAL-DID-DOC] Any found DID MUST be trust-resolved and all its credentials resolved and their attributes indexed.
+[IDX-GENERAL-DID-LK] Links between DIDs (references) MUST be indexed. (ex: a credential presented by DID #1 has been issued by DID #2).
+
+## [IDX-COMMONS]
+
+Commons used cosmos-sdk modules and produced data MUST be indexed.
+
+## [IDX-TR]
+
+[IDX-TR-BASIC] Trust Registries MUST be indexed.
+[IDX-TR-GF] Governance Framework documents MUST be indexed. Their registered hash MUST be verified and a verification flag MUST exist in the database.
+
+## [IDX-CS]
+
+Credential Schemas MUST be indexed.
+
+## [IDX-PERM]
+
+Permissions MUST be indexed.
+
+## [IDX-SESS]
+
+Permission Sessions MUST be indexed.
+
+## [IDX-DD]
+
+DID Directory MUST be indexed.
+
+## [IDX-TD]
+
+Trust Deposits MUST be indexed.
+
+## Implementation
+
+As several cosmos-sdk based chain indexer implementations exist, it will be faster to fork and extend one instead of rebuilding everything from scratch. You should do your own research and we should discuss the choice before starting to build.
+
+Example: [horoscope-v2](https://github.com/aura-nw/horoscope-v2/)
