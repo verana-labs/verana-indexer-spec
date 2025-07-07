@@ -132,7 +132,7 @@ customElements.define("slide-panels",class extends HTMLElement{static get observ
 </tr>
 <tr>
 <td><strong>Real-Time Updates</strong></td>
-<td>Each ledger transaction triggers an index refresh, keeping data in sync.</td>
+<td>Each ledger new block triggers an index refresh, keeping data in sync.</td>
 </tr>
 <tr>
 <td><strong>Lightweight Container</strong></td>
@@ -191,6 +191,29 @@ customElements.define("slide-panels",class extends HTMLElement{static get observ
 </tr>
 </tbody>
 </table>
+<h2 id="idx-general"><a class="toc-anchor" href="#idx-general" >§</a> [IDX-GENERAL]</h2>
+<p>[IDX-GENERAL-DID-DOC] Any found DID MUST be resolved and all its DID document attributes indexed.
+[IDX-GENERAL-DID-TR] Any found DID MUST be trust-resolved and all its credentials resolved and their attributes indexed.
+[IDX-GENERAL-DID-LK] Links between DIDs (references) MUST be indexed. (ex: a credential presented by DID #1 has been issued by DID #2).
+[IDX-GENERAL-DID-UPDATE] Any change to an entity that references a DID MUST trigger [IDX-GENERAL-DID-TR] and [IDX-GENERAL-DID-DOC].</p>
+<h2 id="idx-commons"><a class="toc-anchor" href="#idx-commons" >§</a> [IDX-COMMONS]</h2>
+<p>Commons used cosmos-sdk modules and produced data MUST be indexed.</p>
+<h2 id="idx-tr"><a class="toc-anchor" href="#idx-tr" >§</a> [IDX-TR]</h2>
+<p>[IDX-TR-BASIC] Trust Registries MUST be indexed.
+[IDX-TR-GF] Governance Framework documents MUST be indexed. Their registered hash MUST be verified and a verification flag MUST exist in the database.</p>
+<h2 id="idx-cs"><a class="toc-anchor" href="#idx-cs" >§</a> [IDX-CS]</h2>
+<p>Credential Schemas MUST be indexed.</p>
+<h2 id="idx-perm"><a class="toc-anchor" href="#idx-perm" >§</a> [IDX-PERM]</h2>
+<p>Permissions MUST be indexed.</p>
+<h2 id="idx-sess"><a class="toc-anchor" href="#idx-sess" >§</a> [IDX-SESS]</h2>
+<p>Permission Sessions MUST be indexed.</p>
+<h2 id="idx-dd"><a class="toc-anchor" href="#idx-dd" >§</a> [IDX-DD]</h2>
+<p>DID Directory MUST be indexed.</p>
+<h2 id="idx-td"><a class="toc-anchor" href="#idx-td" >§</a> [IDX-TD]</h2>
+<p>Trust Deposits MUST be indexed.</p>
+<h2 id="implementation"><a class="toc-anchor" href="#implementation" >§</a> Implementation</h2>
+<p>As several cosmos-sdk based chain indexer implementations exist, it will be faster to fork and extend one instead of rebuilding everything from scratch. You should do your own research and we should discuss the choice before starting to build.</p>
+<p>Example: <a path-0="github.com"path-1="aura-nw"path-2="horoscope-v2"path-3=""href="https://github.com/aura-nw/horoscope-v2/" >horoscope-v2</a></p>
 
                     </article>    
       
@@ -233,6 +256,15 @@ customElements.define("slide-panels",class extends HTMLElement{static get observ
 </li>
 </ul>
 </li>
+<li><a href="#idx-general" >[IDX-GENERAL]</a></li>
+<li><a href="#idx-commons" >[IDX-COMMONS]</a></li>
+<li><a href="#idx-tr" >[IDX-TR]</a></li>
+<li><a href="#idx-cs" >[IDX-CS]</a></li>
+<li><a href="#idx-perm" >[IDX-PERM]</a></li>
+<li><a href="#idx-sess" >[IDX-SESS]</a></li>
+<li><a href="#idx-dd" >[IDX-DD]</a></li>
+<li><a href="#idx-td" >[IDX-TD]</a></li>
+<li><a href="#implementation" >Implementation</a></li>
 </ul>
 
                       </div>

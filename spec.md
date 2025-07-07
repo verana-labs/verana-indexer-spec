@@ -88,12 +88,12 @@ The Verana Indexer MUST be delivered as a container.
 |                        | CHAIN_ID      |     | vna-mainnet-1       |
 |                        | NETWORK_NAME  |     | Mainnet       |
 
-
 ## [IDX-GENERAL]
 
-[IDX-GENERAL-DID-TR] Any found DID MUST be resolved and all its DID document attributes indexed.
-[IDX-GENERAL-DID-DOC] Any found DID MUST be trust-resolved and all its credentials resolved and their attributes indexed.
+[IDX-GENERAL-DID-DOC] Any found DID MUST be resolved and all its DID document attributes indexed.
+[IDX-GENERAL-DID-TR] Any found DID MUST be trust-resolved and all its credentials resolved and their attributes indexed.
 [IDX-GENERAL-DID-LK] Links between DIDs (references) MUST be indexed. (ex: a credential presented by DID #1 has been issued by DID #2).
+[IDX-GENERAL-DID-UPDATE] Any change to an entity that references a DID MUST trigger [IDX-GENERAL-DID-TR] and [IDX-GENERAL-DID-DOC].
 
 ## [IDX-COMMONS]
 
