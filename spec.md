@@ -97,20 +97,189 @@ The Verana Indexer MUST be delivered as a container.
 
 ## [IDX-COMMONS]
 
+### Basic Cosmos-SDK data
+
 Commons used cosmos-sdk modules and produced data MUST be indexed.
+
+### Verana Data
+
+All query response must include at least:
+
+- a timestamp that matches the last indexed block of the chain;
+- the block height;
+
 
 ## [IDX-TR]
 
-[IDX-TR-BASIC] Trust Registries MUST be indexed.
-[IDX-TR-GF] Governance Framework documents MUST be indexed. Their registered hash MUST be verified and a verification flag MUST exist in the database.
-
 ## [IDX-CS]
 
-Credential Schemas MUST be indexed.
 
 ## [IDX-PERM]
 
-Permissions MUST be indexed.
+### [IDX-PERM-GET-ACCOUNT-REPUTATION] Get Account Reputation
+
+#### Get Account Reputation - parameters
+
+- `account` (account) (*mandatory*)
+- `tr_id` (number) (*optional*): filter by trust registry id.
+- `schema_id` (number) (*optional*): filter by schema_id.
+- `include_slash_details` (boolean) (*optional*): if we include the detail of slashs/repayments.
+
+If user specifies `tr_id`, we will include info of all credential schemas of this trust registry. If user specifies `schema_id`, we will include info of this credential schema of the controller trust registry. If nothing is specified, we'll return info of all trust registries and their credential schemas.
+
+#### Get Account Reputation - returned data
+
+Returns reputation of a given account. Can filter by ecosystem (trust registry) or credential schema.
+
+Reputation includes, added to common data that must always been returned:
+
+**Global data:**
+
+- the account address;
+- the account balance;
+- the trust deposit of this account;
+- the slashed trust deposit amount of this account;
+- the repaid trust deposit amount of this account;
+- the number of slashs of this account;
+- the date of the first interaction of this account with an ecosystem (trust registry) or the did directory;
+- the total number of trust registries controlled by this account;
+- the total number of credential schemas controlled by this account;
+
+if `include_slash_details` is true:
+
+- a list of slash_details:
+
+**Slash Details**
+
+- slashed_ts:
+- slashed_by:
+- repaid_ts:
+- repaid_by:
+
+
+Then what's follows depend on filter.
+
+For each Trust Registry: (depends on filter), if account have had at least one interaction linked to one credential schema of this trust registry:
+
+**Trust registry data:**
+
+For each considered trust registry, a list of credential schema related data, if account have had at least one interaction with the schema:
+
+**Credential schema data:**
+
+- the calculated permission-based trust deposit of this account in the context of the credential schema;
+- the calculated permission-based slashed trust deposit amount of this account in the context of the credential schema;
+- the calculated permission-based repaid trust deposit amount of this account in the context of the credential schema;
+- the calculated permission-based number of slashs of this account in the context of the credential schema;
+- the number of issued credentials (if available (sessions)) in the context of the credential schema;
+- the number of verified credentials (if available (sessions)) in the context of the credential schema;
+- the number of validation processes run as a validator in the context of the credential schema;
+- the number of validation processes run as an applicant in the context of the credential schema;
+
+- the total number of ISSUER permissions in the context of the credential schema;
+- the total number of VERIFIER permissions in the context of the credential schema;
+- the total number of ISSUER_GRANTOR permissions in the context of the credential schema;
+- the total number of VERIFIER_GRANTOR permissions in the context of the credential schema;
+- the total number of ECOSYSTEM permissions in the context of the credential schema;
+
+- the number of active (not revoked, not expired) ISSUER permissions in the context of the credential schema;
+- the number of active (not revoked, not expired) VERIFIER permissions in the context of the credential schema;
+- the number of active (not revoked, not expired) ISSUER_GRANTOR permissions in the context of the credential schema;
+- the number of active (not revoked, not expired) VERIFIER_GRANTOR permissions in the context of the credential schema;
+- the number of active (not revoked, not expired) ECOSYSTEM permissions in the context of the credential schema;
+
+if `include_slash_details` is true:
+
+- a list of permission_slash_details
+
+**Permission Slash Details:**
+
+- perm_id
+- slashed_ts
+- slashed_by
+- repaid_ts
+- repaid_by
+
+
+### [IDX-PERM-PERMISSION-TREE] Get Permission Tree
+
+#### Get Permission Tree - parameters
+
+- `schema_id` (number) (*mandatory*): the schema id.
+- `perm_id` (number) (*optional*): return sub-tree from this perm_id only
+- `limit_type` (PermissionType) (*optional*): if we want to limit to until a specific permission type.
+- `only_valid` (boolean) (*optional*): if set to true, only return valid permissions.
+
+if `perm_id` is set, return only sub-tree starting from this perm.
+
+If user specifies `limit_type`, we return only part of the tree.
+
+- if `limit_type` is set to ECOSYSTEM: return only ECOSYSTEM permissions.
+- if `limit_type` is set to ISSUER_GRANTOR: return at most ECOSYSTEM and ISSUER_GRANTOR permissions.
+- if `limit_type` is set to VERIFIER_GRANTOR: return at most ECOSYSTEM and VERIFIER_GRANTOR permissions.
+- if `limit_type` is set to ISSUER: return at most ECOSYSTEM, ISSUER_GRANTOR, and ISSUER permissions.
+- if `limit_type` is set to VERIFIER: return at most ECOSYSTEM, VERIFIER_GRANTOR, and VERIFIER permissions.
+- if `limit_type` is set to HOLDER: return at most ECOSYSTEM, ISSUER_GRANTOR, ISSUER, and HOLDER permissions.
+
+If `only_valid` is specified and set to true, omit invalid permissions.
+
+#### Get Permission Tree - returned data
+
+Returns schema full info (all data) as well as a tree of permissions, with a format similar to this example:
+
+```json
+{
+   "schema_id": 1234,
+   ... other schema info...
+   "permission_tree": [
+      {
+         id: 1234,
+         type: ECOSYSTEM,
+         ...
+         "issuer_grantors": [
+            {
+               id: 2345,
+               type: ISSUER_GRANTOR,
+               ...
+               "issuers": [
+                  {
+                  id: 3456,
+                  type: ISSUER,
+                  ...
+                  "issuers": [
+                     ...
+                  ]
+                  },
+                  {
+                     ...
+                  }
+                  ...
+
+               ]
+            },
+            {
+               id: 5678,
+               ...
+            }
+         ]
+      }
+   ]
+
+}
+```
+
+
+### [IDX-PERM-GET-PERMISSION] Get a Permission
+
+#### Get a Permission - parameters
+
+- `perm_id` (number) (*mandatory*)
+
+#### Get a Permission - returned data
+
+Returns the permission
+
+
 
 ## [IDX-SESS]
 

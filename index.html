@@ -197,14 +197,192 @@ customElements.define("slide-panels",class extends HTMLElement{static get observ
 [IDX-GENERAL-DID-LK] Links between DIDs (references) MUST be indexed. (ex: a credential presented by DID #1 has been issued by DID #2).
 [IDX-GENERAL-DID-UPDATE] Any change to an entity that references a DID MUST trigger [IDX-GENERAL-DID-TR] and [IDX-GENERAL-DID-DOC].</p>
 <h2 id="idx-commons"><a class="toc-anchor" href="#idx-commons" >§</a> [IDX-COMMONS]</h2>
+<h3 id="basic-cosmos-sdk-data"><a class="toc-anchor" href="#basic-cosmos-sdk-data" >§</a> Basic Cosmos-SDK data</h3>
 <p>Commons used cosmos-sdk modules and produced data MUST be indexed.</p>
+<h3 id="verana-data"><a class="toc-anchor" href="#verana-data" >§</a> Verana Data</h3>
+<p>All query response must include at least:</p>
+<ul>
+<li>a timestamp that matches the last indexed block of the chain;</li>
+<li>the block height;</li>
+</ul>
 <h2 id="idx-tr"><a class="toc-anchor" href="#idx-tr" >§</a> [IDX-TR]</h2>
-<p>[IDX-TR-BASIC] Trust Registries MUST be indexed.
-[IDX-TR-GF] Governance Framework documents MUST be indexed. Their registered hash MUST be verified and a verification flag MUST exist in the database.</p>
 <h2 id="idx-cs"><a class="toc-anchor" href="#idx-cs" >§</a> [IDX-CS]</h2>
-<p>Credential Schemas MUST be indexed.</p>
 <h2 id="idx-perm"><a class="toc-anchor" href="#idx-perm" >§</a> [IDX-PERM]</h2>
-<p>Permissions MUST be indexed.</p>
+<h3 id="idx-perm-get-account-reputation-get-account-reputation"><a class="toc-anchor" href="#idx-perm-get-account-reputation-get-account-reputation" >§</a> [IDX-PERM-GET-ACCOUNT-REPUTATION] Get Account Reputation</h3>
+<h4 id="get-account-reputation-parameters"><a class="toc-anchor" href="#get-account-reputation-parameters" >§</a> Get Account Reputation - parameters</h4>
+<ul>
+<li><code>account</code> (account) (<em>mandatory</em>)</li>
+<li><code>tr_id</code> (number) (<em>optional</em>): filter by trust registry id.</li>
+<li><code>schema_id</code> (number) (<em>optional</em>): filter by schema_id.</li>
+<li><code>include_slash_details</code> (boolean) (<em>optional</em>): if we include the detail of slashs/repayments.</li>
+</ul>
+<p>If user specifies <code>tr_id</code>, we will include info of all credential schemas of this trust registry. If user specifies <code>schema_id</code>, we will include info of this credential schema of the controller trust registry. If nothing is specified, we’ll return info of all trust registries and their credential schemas.</p>
+<h4 id="get-account-reputation-returned-data"><a class="toc-anchor" href="#get-account-reputation-returned-data" >§</a> Get Account Reputation - returned data</h4>
+<p>Returns reputation of a given account. Can filter by ecosystem (trust registry) or credential schema.</p>
+<p>Reputation includes, added to common data that must always been returned:</p>
+<p><strong>Global data:</strong></p>
+<ul>
+<li>the account address;</li>
+<li>the account balance;</li>
+<li>the trust deposit of this account;</li>
+<li>the slashed trust deposit amount of this account;</li>
+<li>the repaid trust deposit amount of this account;</li>
+<li>the number of slashs of this account;</li>
+<li>the date of the first interaction of this account with an ecosystem (trust registry) or the did directory;</li>
+<li>the total number of trust registries controlled by this account;</li>
+<li>the total number of credential schemas controlled by this account;</li>
+</ul>
+<p>if <code>include_slash_details</code> is true:</p>
+<ul>
+<li>a list of slash_details:</li>
+</ul>
+<p><strong>Slash Details</strong></p>
+<ul>
+<li>slashed_ts:</li>
+<li>slashed_by:</li>
+<li>repaid_ts:</li>
+<li>repaid_by:</li>
+</ul>
+<p>Then what’s follows depend on filter.</p>
+<p>For each Trust Registry: (depends on filter), if account have had at least one interaction linked to one credential schema of this trust registry:</p>
+<p><strong>Trust registry data:</strong></p>
+<p>For each considered trust registry, a list of credential schema related data, if account have had at least one interaction with the schema:</p>
+<p><strong>Credential schema data:</strong></p>
+<ul>
+<li>
+<p>the calculated permission-based trust deposit of this account in the context of the credential schema;</p>
+</li>
+<li>
+<p>the calculated permission-based slashed trust deposit amount of this account in the context of the credential schema;</p>
+</li>
+<li>
+<p>the calculated permission-based repaid trust deposit amount of this account in the context of the credential schema;</p>
+</li>
+<li>
+<p>the calculated permission-based number of slashs of this account in the context of the credential schema;</p>
+</li>
+<li>
+<p>the number of issued credentials (if available (sessions)) in the context of the credential schema;</p>
+</li>
+<li>
+<p>the number of verified credentials (if available (sessions)) in the context of the credential schema;</p>
+</li>
+<li>
+<p>the number of validation processes run as a validator in the context of the credential schema;</p>
+</li>
+<li>
+<p>the number of validation processes run as an applicant in the context of the credential schema;</p>
+</li>
+<li>
+<p>the total number of ISSUER permissions in the context of the credential schema;</p>
+</li>
+<li>
+<p>the total number of VERIFIER permissions in the context of the credential schema;</p>
+</li>
+<li>
+<p>the total number of ISSUER_GRANTOR permissions in the context of the credential schema;</p>
+</li>
+<li>
+<p>the total number of VERIFIER_GRANTOR permissions in the context of the credential schema;</p>
+</li>
+<li>
+<p>the total number of ECOSYSTEM permissions in the context of the credential schema;</p>
+</li>
+<li>
+<p>the number of active (not revoked, not expired) ISSUER permissions in the context of the credential schema;</p>
+</li>
+<li>
+<p>the number of active (not revoked, not expired) VERIFIER permissions in the context of the credential schema;</p>
+</li>
+<li>
+<p>the number of active (not revoked, not expired) ISSUER_GRANTOR permissions in the context of the credential schema;</p>
+</li>
+<li>
+<p>the number of active (not revoked, not expired) VERIFIER_GRANTOR permissions in the context of the credential schema;</p>
+</li>
+<li>
+<p>the number of active (not revoked, not expired) ECOSYSTEM permissions in the context of the credential schema;</p>
+</li>
+</ul>
+<p>if <code>include_slash_details</code> is true:</p>
+<ul>
+<li>a list of permission_slash_details</li>
+</ul>
+<p><strong>Permission Slash Details:</strong></p>
+<ul>
+<li>perm_id</li>
+<li>slashed_ts</li>
+<li>slashed_by</li>
+<li>repaid_ts</li>
+<li>repaid_by</li>
+</ul>
+<h3 id="idx-perm-permission-tree-get-permission-tree"><a class="toc-anchor" href="#idx-perm-permission-tree-get-permission-tree" >§</a> [IDX-PERM-PERMISSION-TREE] Get Permission Tree</h3>
+<h4 id="get-permission-tree-parameters"><a class="toc-anchor" href="#get-permission-tree-parameters" >§</a> Get Permission Tree - parameters</h4>
+<ul>
+<li><code>schema_id</code> (number) (<em>mandatory</em>): the schema id.</li>
+<li><code>perm_id</code> (number) (<em>optional</em>): return sub-tree from this perm_id only</li>
+<li><code>limit_type</code> (PermissionType) (<em>optional</em>): if we want to limit to until a specific permission type.</li>
+<li><code>only_valid</code> (boolean) (<em>optional</em>): if set to true, only return valid permissions.</li>
+</ul>
+<p>if <code>perm_id</code> is set, return only sub-tree starting from this perm.</p>
+<p>If user specifies <code>limit_type</code>, we return only part of the tree.</p>
+<ul>
+<li>if <code>limit_type</code> is set to ECOSYSTEM: return only ECOSYSTEM permissions.</li>
+<li>if <code>limit_type</code> is set to ISSUER_GRANTOR: return at most ECOSYSTEM and ISSUER_GRANTOR permissions.</li>
+<li>if <code>limit_type</code> is set to VERIFIER_GRANTOR: return at most ECOSYSTEM and VERIFIER_GRANTOR permissions.</li>
+<li>if <code>limit_type</code> is set to ISSUER: return at most ECOSYSTEM, ISSUER_GRANTOR, and ISSUER permissions.</li>
+<li>if <code>limit_type</code> is set to VERIFIER: return at most ECOSYSTEM, VERIFIER_GRANTOR, and VERIFIER permissions.</li>
+<li>if <code>limit_type</code> is set to HOLDER: return at most ECOSYSTEM, ISSUER_GRANTOR, ISSUER, and HOLDER permissions.</li>
+</ul>
+<p>If <code>only_valid</code> is specified and set to true, omit invalid permissions.</p>
+<h4 id="get-permission-tree-returned-data"><a class="toc-anchor" href="#get-permission-tree-returned-data" >§</a> Get Permission Tree - returned data</h4>
+<p>Returns schema full info (all data) as well as a tree of permissions, with a format similar to this example:</p>
+<pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+   <span class="token property">"schema_id"</span><span class="token operator">:</span> <span class="token number">1234</span><span class="token punctuation">,</span>
+   ... other schema info...
+   <span class="token property">"permission_tree"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span>
+         id<span class="token operator">:</span> <span class="token number">1234</span><span class="token punctuation">,</span>
+         type<span class="token operator">:</span> ECOSYSTEM<span class="token punctuation">,</span>
+         ...
+         <span class="token property">"issuer_grantors"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token punctuation">{</span>
+               id<span class="token operator">:</span> <span class="token number">2345</span><span class="token punctuation">,</span>
+               type<span class="token operator">:</span> ISSUER_GRANTOR<span class="token punctuation">,</span>
+               ...
+               <span class="token property">"issuers"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                  <span class="token punctuation">{</span>
+                  id<span class="token operator">:</span> <span class="token number">3456</span><span class="token punctuation">,</span>
+                  type<span class="token operator">:</span> ISSUER<span class="token punctuation">,</span>
+                  ...
+                  <span class="token property">"issuers"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                     ...
+                  <span class="token punctuation">]</span>
+                  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+                  <span class="token punctuation">{</span>
+                     ...
+                  <span class="token punctuation">}</span>
+                  ...
+
+               <span class="token punctuation">]</span>
+            <span class="token punctuation">}</span><span class="token punctuation">,</span>
+            <span class="token punctuation">{</span>
+               id<span class="token operator">:</span> <span class="token number">5678</span><span class="token punctuation">,</span>
+               ...
+            <span class="token punctuation">}</span>
+         <span class="token punctuation">]</span>
+      <span class="token punctuation">}</span>
+   <span class="token punctuation">]</span>
+
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="idx-perm-get-permission-get-a-permission"><a class="toc-anchor" href="#idx-perm-get-permission-get-a-permission" >§</a> [IDX-PERM-GET-PERMISSION] Get a Permission</h3>
+<h4 id="get-a-permission-parameters"><a class="toc-anchor" href="#get-a-permission-parameters" >§</a> Get a Permission - parameters</h4>
+<ul>
+<li><code>perm_id</code> (number) (<em>mandatory</em>)</li>
+</ul>
+<h4 id="get-a-permission-returned-data"><a class="toc-anchor" href="#get-a-permission-returned-data" >§</a> Get a Permission - returned data</h4>
+<p>Returns the permission</p>
 <h2 id="idx-sess"><a class="toc-anchor" href="#idx-sess" >§</a> [IDX-SESS]</h2>
 <p>Permission Sessions MUST be indexed.</p>
 <h2 id="idx-dd"><a class="toc-anchor" href="#idx-dd" >§</a> [IDX-DD]</h2>
@@ -261,10 +439,36 @@ customElements.define("slide-panels",class extends HTMLElement{static get observ
 </ul>
 </li>
 <li><a href="#idx-general" >[IDX-GENERAL]</a></li>
-<li><a href="#idx-commons" >[IDX-COMMONS]</a></li>
+<li><a href="#idx-commons" >[IDX-COMMONS]</a>
+<ul>
+<li><a href="#basic-cosmos-sdk-data" >Basic Cosmos-SDK data</a></li>
+<li><a href="#verana-data" >Verana Data</a></li>
+</ul>
+</li>
 <li><a href="#idx-tr" >[IDX-TR]</a></li>
 <li><a href="#idx-cs" >[IDX-CS]</a></li>
-<li><a href="#idx-perm" >[IDX-PERM]</a></li>
+<li><a href="#idx-perm" >[IDX-PERM]</a>
+<ul>
+<li><a href="#idx-perm-get-account-reputation-get-account-reputation" >[IDX-PERM-GET-ACCOUNT-REPUTATION] Get Account Reputation</a>
+<ul>
+<li><a href="#get-account-reputation-parameters" >Get Account Reputation - parameters</a></li>
+<li><a href="#get-account-reputation-returned-data" >Get Account Reputation - returned data</a></li>
+</ul>
+</li>
+<li><a href="#idx-perm-permission-tree-get-permission-tree" >[IDX-PERM-PERMISSION-TREE] Get Permission Tree</a>
+<ul>
+<li><a href="#get-permission-tree-parameters" >Get Permission Tree - parameters</a></li>
+<li><a href="#get-permission-tree-returned-data" >Get Permission Tree - returned data</a></li>
+</ul>
+</li>
+<li><a href="#idx-perm-get-permission-get-a-permission" >[IDX-PERM-GET-PERMISSION] Get a Permission</a>
+<ul>
+<li><a href="#get-a-permission-parameters" >Get a Permission - parameters</a></li>
+<li><a href="#get-a-permission-returned-data" >Get a Permission - returned data</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#idx-sess" >[IDX-SESS]</a></li>
 <li><a href="#idx-dd" >[IDX-DD]</a></li>
 <li><a href="#idx-td" >[IDX-TD]</a></li>
