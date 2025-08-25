@@ -90,10 +90,9 @@ The Verana Indexer MUST be delivered as a container.
 
 ## [IDX-GENERAL]
 
-[IDX-GENERAL-DID-DOC] Any found DID MUST be resolved and all its DID document attributes indexed.
-[IDX-GENERAL-DID-TR] Any found DID MUST be trust-resolved and all its credentials resolved and their attributes indexed.
-[IDX-GENERAL-DID-LK] Links between DIDs (references) MUST be indexed. (ex: a credential presented by DID #1 has been issued by DID #2).
-[IDX-GENERAL-DID-UPDATE] Any change to an entity that references a DID MUST trigger [IDX-GENERAL-DID-TR] and [IDX-GENERAL-DID-DOC].
+:::note
+examples are given for understanding only and are non-normative.
+:::
 
 ## [IDX-COMMONS]
 
@@ -101,24 +100,37 @@ The Verana Indexer MUST be delivered as a container.
 
 Commons used cosmos-sdk modules and produced data MUST be indexed.
 
-### Verana Data
+### [IDX-COMMONS-VERANA] Verana Data
 
-All query response must include at least:
+#### [IDX-COMMONS-VERANA-REQUEST] Mandatory Request Parameters
 
-- a timestamp that matches the last indexed block of the chain;
-- the block height;
+All Verana methods MUST include the following mandatory parameters:
 
+- `query_at` (timestamp) (*optional*): if set, query *at* `query_at`, else query *at* now(). Used to query the ledger state at a previous datetime.
+
+:::warning
+Be careful with the `query_at`. Returned data MUST be properly calculated. Example: if a permission has been revoked today and a query returns the same permission *at* yesterday, permission MUST NOT appear revoked in the future in the returned data, it MUST be returned as it was at the specific datetime. For slashed perms, it implies having a copy of all slashs to properly recalculate the permission state at an earlier date.
+:::
+
+#### [IDX-COMMONS-VERANA-RESPONSE] Mandatory Response Parameters
+
+All query response MUST include at least:
+
+- `index_ts` (timestamp): a timestamp that matches the last indexed block of the chain;
+- `height` (number): the block height;
+- `query_at` (timestamp): the datetime *at* which the query response is valid.
 
 ## [IDX-TR]
 
 ## [IDX-CS]
-
 
 ## [IDX-PERM]
 
 ### [IDX-PERM-GET-ACCOUNT-REPUTATION] Get Account Reputation
 
 #### Get Account Reputation - parameters
+
+Added to [IDX-COMMONS-VERANA-REQUEST], this method MUST provide the following request parameters:
 
 - `account` (account) (*mandatory*)
 - `tr_id` (number) (*optional*): filter by trust registry id.
@@ -131,7 +143,7 @@ If user specifies `tr_id`, we will include info of all credential schemas of thi
 
 Returns reputation of a given account. Can filter by ecosystem (trust registry) or credential schema.
 
-Reputation includes, added to common data that must always been returned:
+Added to [IDX-COMMONS-VERANA-RESPONSE], this method MUST provide the following response parameters:
 
 **Global data:**
 
@@ -155,7 +167,6 @@ if `include_slash_details` is true:
 - slashed_by:
 - repaid_ts:
 - repaid_by:
-
 
 Then what's follows depend on filter.
 
@@ -195,11 +206,79 @@ if `include_slash_details` is true:
 **Permission Slash Details:**
 
 - perm_id
+- schema_id
+- tr_id
 - slashed_ts
 - slashed_by
 - repaid_ts
 - repaid_by
 
+### [IDX-PERM-PERMISSION-LIST] List Permissions
+
+#### [IDX-PERM-PERMISSION-LIST-REQUEST] List Permissions - parameters
+
+Added to [IDX-COMMONS-VERANA-REQUEST], this method MUST provide the following request parameters:
+
+- `schema_id` (number) (*mandatory*): the schema id.
+- `grantee` (account) (*optional*): the grantee account.
+- `did` (string) (*optional*): the did the permission refers to.
+- `perm_id` (number) (*optional*): limit to permissions where the `validator_perm_id` is `perm_id`.
+- `type` (PermissionType) (*optional*): if we want to limit to a specific permission type.
+- `only_valid` (boolean) (*optional*): if set to true, only return valid permissions.
+- `query_at` (timestamp) (*optional*): if set, query *at* `query_at`, else query *at* now(). Used to query the ledger state at a previous datetime.
+- `modified_after` (timestamp) (*optional*): limit to permissions modified after (or equal to) `modified_after`.
+- `response_max_size` (small number) (*optional*): limit to `response_max_size` results. Must be min 1, max 1,024. Default to 32.
+- `country` (string) (*optional*): limit to `country`.
+- `vp_state` (ValidationState) (*optional*): limit to permissions with a `vp_state` not null and equal to `vp_state`.
+
+#### [IDX-PERM-PERMISSION-LIST-RESPONSE] List Permissions - returned data
+
+Added to [IDX-COMMONS-VERANA-RESPONSE], this method MUST provide the following response parameters:
+
+A list of found permissions, if any.
+
+Example (non-normative):
+
+```json
+{
+
+   "metadata": {
+      "index_ts": "2025-08-25T09:58:06+00:00Z",
+      "height": 12345,
+      "query_at": "2025-08-25T09:58:06+00:00Z",
+      ...
+   },
+   "permissions": [
+      {
+         id: 1234,
+         schema_id: ...
+         type: ECOSYSTEM,
+         ...
+      },
+      {
+            id: 2345,
+            schema_id: ...
+            type: ECOSYSTEM,
+            ...
+      },
+   ]
+   
+   ...
+```
+
+### [IDX-PERM-GET-PERMISSION] Get a Permission
+
+#### Get a Permission - parameters
+
+Added to [IDX-COMMONS-VERANA-REQUEST], this method MUST provide the following request parameters:
+
+- `perm_id` (number) (*mandatory*)
+
+#### Get a Permission - returned data
+
+Added to [IDX-COMMONS-VERANA-RESPONSE], this method MUST provide the following response parameters:
+
+Returns the permission.
 
 ### [IDX-PERM-PERMISSION-TREE] Get Permission Tree
 
@@ -229,6 +308,12 @@ Returns schema full info (all data) as well as a tree of permissions, with a for
 
 ```json
 {
+   "metadata": {
+      "index_ts": "2025-08-25T09:58:06+00:00Z",
+      "height": 12345,
+      "query_at": "2025-08-25T09:58:06+00:00Z"
+      ...
+   }
    "schema_id": 1234,
    ... other schema info...
    "permission_tree": [
@@ -267,19 +352,6 @@ Returns schema full info (all data) as well as a tree of permissions, with a for
 
 }
 ```
-
-
-### [IDX-PERM-GET-PERMISSION] Get a Permission
-
-#### Get a Permission - parameters
-
-- `perm_id` (number) (*mandatory*)
-
-#### Get a Permission - returned data
-
-Returns the permission
-
-
 
 ## [IDX-SESS]
 
